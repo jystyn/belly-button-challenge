@@ -56,7 +56,7 @@ function horizontalBarChart(id) {
         }];
 
         let layout = {
-            title: `Top 10 OTUs for OTU ${id}`
+            title: `Top 10 OTUs for ID No. ${id}`
         };
         
         Plotly.newPlot('bar', trace, layout);
@@ -91,5 +91,4 @@ function horizontalBarChart(id) {
 function optionChanged(selected) {
     horizontalBarChart(selected);
 }
-
 init();
