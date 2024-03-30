@@ -3,7 +3,7 @@ const url = 'https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json'
 
 const dataPromise = d3.json(url);
 
-// This populates the dropdown button
+// This populates the dropdown button and intializes the functions
 function init() {
     // #selDataset is html id for dropdown button
     let dropdownMenu = d3.select('#selDataset');
