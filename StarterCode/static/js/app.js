@@ -1,17 +1,14 @@
 //1. Use the D3 library to read in samples.json from the URL 'https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json'.
 const url = 'https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json';
 const dataPromise = d3.json(url);
-dataPromise.then((data => console.log(`object, are you sure the data came through? ${data}`)));
+//dataPromise.then((data => console.log(`object, are you sure the data came through? ${data}`)));
 
 function init() {
     // #selDataset is id for dropdown button
     // This to practice on a random id from the data set
-    d3.selectAll('#selDataset').on('change', optionChanged)
+    d3.selectAll('#selDataset').on('change', optionChanged);
     getData();
-
 }
-// 2. Create a horizontal bar chart with a dropdown menu to display the top 10 OTUs found in that individual.
-
 function getData() {
     let dropdownMenu = d3.select('#selDataset');
 
@@ -32,7 +29,7 @@ function getData() {
         gaugeChart(name);
     });
 }
-
+// 2. Create a horizontal bar chart with a dropdown menu to display the top 10 OTUs found in that individual.
 function barChart(id) {
     dataPromise.then((data) => {
         // Return samples for selected id
@@ -80,11 +77,9 @@ function bubbleChart(id) {
                 color: samples.otu_ids
             }
         }];
-
         let layout = {
             xaxis: { title: 'OTU ID' }
         };
-
         Plotly.newPlot('bubble', trace, layout);
     });
 }
