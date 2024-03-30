@@ -27,23 +27,25 @@ function getData() {
         let name = names[0];
         
         
-        horizontalBarChart(name);
+        barChart(name);
+        bubbleChart(name);
+        displayData(name);
     });
 }
 
-function horizontalBarChart(id) {
+function barChart(id) {
     dataPromise.then((data)=> {
-        // Filter for the desired id and get the first index.
-        let sample = data.samples.filter(result => result.id == id)[0];
+        // Filter for the desired id and get the index.
+        let samples = data.samples.filter(result => result.id == id)[0];
 
         // Use sample_values as the values(x) for the bar chart.
-        let sample_values = sample.sample_values.slice(0,10).reverse();
+        let sample_values = samples.sample_values.slice(0,10).reverse();
 
         // Use otu_ids as the labels(y) for the bar chart.
-        let otu_ids = sample.otu_ids.slice(0,10).map(id => `OTU ${id}`).reverse();
+        let otu_ids = samples.otu_ids.slice(0,10).map(id => `OTU ${id}`).reverse();
 
         // Use otu_labels as the hovertext(text) for the chart.
-        let otu_labels = sample.otu_labels.slice(0,10).reverse();
+        let otu_labels = samples.otu_labels.slice(0,10).reverse();
 
         console.log(otu_ids, otu_labels, sample_values);
 
@@ -62,24 +64,56 @@ function horizontalBarChart(id) {
         Plotly.newPlot('bar', trace, layout);
     });
 }
-
-
-
-
 // 3. Create a bubble chart that displays each sample.
-// Use otu_ids for the x values.
-// Use sample_values for the y values.
-// Use sample_values for the marker size.
-// Use otu_ids for the marker colors.
-// Use otu_labels for the text values.
+function bubbleChart(id) {
+    dataPromise.then((data)=> {
+        // Filter for the desired id and get the index.
+        let samples = data.samples.filter(result => result.id == id)[0];
+
+        // Use otu_ids for the x values.
+        // Use sample_values for the y values.
+        // Use sample_values for the marker size.
+        // Use otu_ids for the marker colors.
+        // Use otu_labels for the text values.
+        let trace = [{
+            x: samples.otu_ids,
+            y: samples.sample_values,
+            text: samples.otu_labels,
+            mode: 'markers',
+            marker: {
+                size: samples.sample_values,
+                color: samples.otu_ids
+            }
+        }];
+
+        let layout = {
+            xaxis: {title: 'OTU ID'}
+        };
+
+        Plotly.newPlot('bubble', trace, layout);
+    });
+
+}
 
 // 4. Display the sample metadata, i.e., an individual's demographic information.
-
 // 5. Display each key-value pair from the metadata JSON object somewhere on the page.
+function displayData(id) {
+    let displaySample = d3.select('#sample-metadata');
 
-// 6. Update all the plots when a new sample is selected. Additionally, you are welcome to create any layout that you would like for your dashboard.
+    dataPromise.then((data)=> {
+        let metaData = data.metadata.filter(result => result.id == id)[0];
+        let entries = Object.entries(metaData);
 
-// 7. Deploy your app to a free static page hosting service, such as GitHub Pages. Submit the links to your deployment and your GitHub repo. Ensure that your repository has regular commits and a thorough README.md file
+        entries.forEach(([key, value]) => {
+            displaySample.append('h6').text(`${key}: ${value}`);
+        });
+    });
+}
+
+
+
+
+
 
 // Bonus: 
 // Adapt the Gauge Chart from 'https://plot.ly/javascript/gauge-charts/Links' to an external site. to plot the weekly washing frequency of the individual.
@@ -87,8 +121,13 @@ function horizontalBarChart(id) {
 // Update the chart whenever a new sample is selected.
 
 
-// This is the function that gets called when you change the dropdown value
+
+// 6. Update all the plots when a new sample is selected. Additionally, you are welcome to create any layout that you would like for your dashboard.
 function optionChanged(selected) {
-    horizontalBarChart(selected);
+    barChart(selected);
+    bubbleChart(selected);
+    displayData(selected);
 }
+
+// 7. Deploy your app to a free static page hosting service, such as GitHub Pages. Submit the links to your deployment and your GitHub repo. Ensure that your repository has regular commits and a thorough README.md file
 init();
