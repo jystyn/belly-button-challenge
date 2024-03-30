@@ -41,7 +41,7 @@ function displayCharts(id) {
             orientation: 'h'
         }];
         let barLayout = {
-            title: `Top 10 OTUs for ID No. ${id}`
+            title: `Top 10 OTUs for Test Subject ID No. ${id}`
         };
         //Bubble Chart -- All Samples
         let bubbleTrace = [{
@@ -92,7 +92,7 @@ function gaugeChart(id) {
             type: 'indicator',
             mode: 'gauge+number',
             value: metaData.wfreq,
-            title: `ID No. ${id}<br>Belly Button Washing Frequency<br>Scrubs per Week`,
+            title: `Test Subject ID No. ${id}<br>Belly Button Washing Frequency<br>Scrubs per Week`,
             gauge: {
                 axis: { range: [null, 9] },
                 steps: [
