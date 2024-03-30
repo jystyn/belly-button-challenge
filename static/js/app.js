@@ -1,73 +1,50 @@
-//1. Use the D3 library to read in samples.json from the URL 'https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json'.
+// URL for samples.json data
 const url = 'https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json';
-const dataPromise = d3.json(url);
-//dataPromise.then((data => console.log(`object, are you sure the data came through? ${data}`)));
 
+const dataPromise = d3.json(url);
+
+// This populates the dropdown button
 function init() {
-    // #selDataset is id for dropdown button
-    // This to practice on a random id from the data set
-    d3.selectAll('#selDataset').on('change', optionChanged);
-    getData();
-}
-function getData() {
+    // #selDataset is html id for dropdown button
     let dropdownMenu = d3.select('#selDataset');
+    // Call the optionChanged function when the dropdown value is changed
+    d3.selectAll('#selDataset').on('change', optionChanged);
 
     dataPromise.then((data) => {
+        // Return list of names
         let names = data.names;
-        //console.log(`Please object, you said that last time... ${names}`)
+        // Populates the options for the dropdown in the html
         names.forEach(name => {
             dropdownMenu.append('option')
                 .property('value', name)
                 .text(name);
         });
-
         let name = names[0];
 
-        barChart(name);
-        bubbleChart(name);
+        displayCharts(name);
         displayData(name);
         gaugeChart(name);
     });
 }
-// 2. Create a horizontal bar chart with a dropdown menu to display the top 10 OTUs found in that individual.
-function barChart(id) {
+// Display Charts
+function displayCharts(id) {
     dataPromise.then((data) => {
         // Return samples for selected id
         let samples = data.samples.filter(result => result.id == id)[0];
 
-        // Use sample_values as the values(x) for the bar chart.
-        let sample_values = samples.sample_values.slice(0, 10).reverse();
-
-        // Use otu_ids as the labels(y) for the bar chart.
-        let otu_ids = samples.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse();
-
-        // Use otu_labels as the hovertext(text) for the chart.
-        let otu_labels = samples.otu_labels.slice(0, 10).reverse();
-
-        //console.log(otu_ids, otu_labels, sample_values);
-
-        let trace = [{
-            x: sample_values,
-            y: otu_ids,
-            text: otu_labels,
+        //Bar Chart -- Top 10 OTUs
+        let barTrace = [{
+            x: samples.sample_values.slice(0, 10).reverse(),
+            y: samples.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse(),
+            text: samples.otu_labels.slice(0, 10).reverse(),
             type: 'bar',
             orientation: 'h'
         }];
-        let layout = {
+        let barLayout = {
             title: `Top 10 OTUs for ID No. ${id}`
         };
-        Plotly.newPlot('bar', trace, layout);
-    });
-}
-// 3. Create a bubble chart that displays each sample.
-function bubbleChart(id) {
-    dataPromise.then((data) => {
-        // Filter for the desired id and get the index.
-        let samples = data.samples.filter(result => result.id == id)[0];
-
-        // Use otu_ids for the x values, sample_values for the y values, and otu_labels for the text values.
-        // Use sample_values for the marker size, otu_ids for the marker colors.
-        let trace = [{
+        //Bubble Chart -- All Samples
+        let bubbleTrace = [{
             x: samples.otu_ids,
             y: samples.sample_values,
             text: samples.otu_labels,
@@ -77,15 +54,17 @@ function bubbleChart(id) {
                 color: samples.otu_ids
             }
         }];
-        let layout = {
+        let bubbleLayout = {
             xaxis: { title: 'OTU ID' }
         };
-        Plotly.newPlot('bubble', trace, layout);
+        //Plot them Charts
+        Plotly.newPlot('bar', barTrace, barLayout);
+        Plotly.newPlot('bubble', bubbleTrace, bubbleLayout);
     });
 }
-// 4. Display the sample metadata, i.e., an individual's demographic information.
-// 5. Display each key-value pair from the metadata JSON object somewhere on the page.
+// Display the sample metadata
 function displayData(id) {
+    // #sample-metadata is the html id for the text card 
     let displaySample = d3.select('#sample-metadata');
 
     dataPromise.then((data) => {
@@ -95,7 +74,7 @@ function displayData(id) {
         //Return the metaData as key-value pairs
         let entries = Object.entries(metaData);
 
-        //This clears out text before refilling
+        //Clear out the text from previous search
         displaySample.text('');
 
         //Populate the text for the selected ID using forEach() loop
@@ -104,10 +83,7 @@ function displayData(id) {
         });
     });
 }
-// Bonus: 
-// Adapt the Gauge Chart from 'https://plot.ly/javascript/gauge-charts/Links' to an external site. to plot the weekly washing frequency of the individual.
-// You will need to modify the example gauge code to account for values ranging from 0 through 9.
-// Update the chart whenever a new sample is selected.
+// Bonus -- Gauge Chart
 function gaugeChart(id) {
     dataPromise.then((data) => {
         let metaData = data.metadata.filter(result => result.id == id)[0];
@@ -116,7 +92,7 @@ function gaugeChart(id) {
             type: 'indicator',
             mode: 'gauge+number',
             value: metaData.wfreq,
-            title: 'Belly Button Washing Frequency<br>Scrubs per Week',
+            title: `ID No. ${id}<br>Belly Button Washing Frequency<br>Scrubs per Week`,
             gauge: {
                 axis: { range: [null, 9] },
                 steps: [
@@ -135,12 +111,11 @@ function gaugeChart(id) {
         Plotly.newPlot('gauge', trace);
     });
 }
-// 6. Update all the plots when a new sample is selected. Additionally, you are welcome to create any layout that you would like for your dashboard.
+// Update page when new sample is selected
 function optionChanged(selected) {
-    barChart(selected);
-    bubbleChart(selected);
+    displayCharts(selected);
     displayData(selected);
     gaugeChart(selected);
 }
-// 7. Deploy your app to a free static page hosting service, such as GitHub Pages. Submit the links to your deployment and your GitHub repo. Ensure that your repository has regular commits and a thorough README.md file
+
 init();
