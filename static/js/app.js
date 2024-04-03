@@ -32,7 +32,7 @@ function displayCharts(id) {
         // Return samples for selected id
         let samples = data.samples.filter(result => result.id == id)[0];
 
-        //Bar Chart -- Top 10 OTUs
+        // Bar Chart -- Top 10 OTUs
         let barTrace = [{
             x: samples.sample_values.slice(0, 10).reverse(),
             y: samples.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse(),
@@ -43,7 +43,7 @@ function displayCharts(id) {
         let barLayout = {
             title: `Top 10 OTUs for Test Subject ID No. ${id}`
         };
-        //Bubble Chart -- All Samples
+        // Bubble Chart -- All Samples
         let bubbleTrace = [{
             x: samples.otu_ids,
             y: samples.sample_values,
@@ -57,7 +57,7 @@ function displayCharts(id) {
         let bubbleLayout = {
             xaxis: { title: 'OTU ID' }
         };
-        //Plot them Charts
+        // Plot them Charts
         Plotly.newPlot('bar', barTrace, barLayout);
         Plotly.newPlot('bubble', bubbleTrace, bubbleLayout);
     });
@@ -68,16 +68,16 @@ function displayData(id) {
     let displaySample = d3.select('#sample-metadata');
 
     dataPromise.then((data) => {
-        //Return metadata for selected ID
+        // Return metadata for selected ID
         let metaData = data.metadata.filter(result => result.id == id)[0];
 
-        //Return the metaData as key-value pairs
+        // Return the metaData as key-value pairs
         let entries = Object.entries(metaData);
 
-        //Clear out the text from previous search
+        // Clear out the text from previous search
         displaySample.text('');
 
-        //Populate the text for the selected ID using forEach() loop
+        // Populate the text for the selected ID using forEach() loop
         entries.forEach(([key, value]) => {
             displaySample.append('ul').text(`${key}: ${value}`);
         });
@@ -111,11 +111,11 @@ function gaugeChart(id) {
         Plotly.newPlot('gauge', trace);
     });
 }
-// Update page when new sample is selected
-function optionChanged(selected) {
-    displayCharts(selected);
-    displayData(selected);
-    gaugeChart(selected);
+// Update page when a new id is selected
+function optionChanged(new_id) {
+    displayCharts(new_id);
+    displayData(new_id);
+    gaugeChart(new_id);
 }
 
 init();
